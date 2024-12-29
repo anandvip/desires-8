@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desire Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .auth-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .auth-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .auth-buttons .sign-in {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .auth-buttons .sign-in:hover {
+            background-color: #38a169;
+        }
+
+        .auth-buttons .sign-out {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .auth-buttons .sign-out:hover {
+            background-color: #c53030;
+        }
+
+        .input-methods {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: #ffffff;
+            background-color: #48bb78;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            background-color: #38a169;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, textarea, select {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .desires-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .desire-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .desire-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.25em;
+            color: #2d3748;
+        }
+
+        .desire-card p {
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Desire Tracker</h1>
+
+        <div class="auth-buttons">
+            <button id="signInBtn" class="sign-in">Sign in with Google</button>
+            <button id="signOutBtn" class="sign-out" style="display: none;">Sign Out</button>
+        </div>
+
+        <div class="input-methods">
+            <button class="button" id="voiceInput">🎤 Voice Input</button>
+            <button class="button" id="manualInput">✏️ Manual Input</button>
+        </div>
+
+        <form id="desireForm" style="display: none;">
+            <div class="form-group">
+                <label for="desireTitle">What's your desire?</label>
+                <input type="text" id="desireTitle" placeholder="Enter your desire...">
+            </div>
+
+            <div class="form-group">
+                <label for="desireDescription">Description</label>
+                <textarea id="desireDescription" placeholder="Describe your desire..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="desirePriority">Priority Level</label>
+                <select id="desirePriority">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+
+            <button type="submit">Add Desire</button>
+        </form>
+
+        <div class="desires-list" id="desiresList">
+            <!-- Desires will be listed here -->
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
+        import {
+            getAuth,
+            signInWithPopup,
+            GoogleAuthProvider,
+            signOut,
+            onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            doc,
+            deleteDoc
+        } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-auth-domain",
+            projectId: "your-project-id",
+            storageBucket: "your-storage-bucket",
+            messagingSenderId: "your-messaging-sender-id",
+            appId: "your-app-id"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        const signInBtn = document.getElementById('signInBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const desireForm = document.getElementById('desireForm');
+        const desiresList = document.getElementById('desiresList');
+
+        const renderDesires = async () => {
+            desiresList.innerHTML = '';
+            const querySnapshot = await getDocs(collection(db, 'desires'));
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const desireCard = document.createElement('div');
+                desireCard.className = 'desire-card';
+                desireCard.innerHTML = `
+                    <h3>${data.title}</h3>
+                    <p>${data.description}</p>
+                    <p><strong>Priority:</strong> ${data.priority}</p>
+                    <button onclick="deleteDesire('${doc.id}')">Delete</button>
+                `;
+                desiresList.appendChild(desireCard);
+            });
+        };
+
+        const addDesire = async (title, description, priority) => {
+            await addDoc(collection(db, 'desires'), { title, description, priority });
+            renderDesires();
+        };
+
+        desireForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('desireTitle').value;
+            const description = document.getElementById('desireDescription').value;
+            const priority = document.getElementById('desirePriority').value;
+            addDesire(title, description, priority);
+            desireForm.reset();
+        });
+
+        const deleteDesire = async (id) => {
+            await deleteDoc(doc(db, 'desires', id));
+            renderDesires();
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                signInBtn.style.display = 'none';
+                signOutBtn.style.display = 'block';
+                renderDesires();
+            } else {
+                signInBtn.style.display = 'block';
+                signOutBtn.style.display = 'none';
+                desiresList.innerHTML = '<p>Please sign in to view your desires.</p>';
+            }
+        });
+
+        signInBtn.addEventListener('click', async () => {
+            await signInWithPopup(auth, provider);
+        });
+
+        signOutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+        });
+    </script>
+</body>
+</html>
