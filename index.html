@@ -5,190 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Desire Tracker</title>
     <style>
-        * {
+        /* Basic styles for the app */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-        }
-
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 20px auto;
-            background: #ffffff;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #2d3748;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-weight: 700;
-        }
-
-        .auth-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .auth-buttons button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .auth-buttons .sign-in {
-            background-color: #48bb78;
-            color: white;
-        }
-
-        .auth-buttons .sign-in:hover {
-            background-color: #38a169;
-        }
-
-        .auth-buttons .sign-out {
-            background-color: #f56565;
-            color: white;
-        }
-
-        .auth-buttons .sign-out:hover {
-            background-color: #c53030;
-        }
-
-        .input-methods {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            color: #ffffff;
-            background-color: #48bb78;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .button:hover {
-            background-color: #38a169;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        input, textarea, select {
-            padding: 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #5a67d8;
-        }
-
-        .desires-list {
-            display: grid;
-            gap: 15px;
-        }
-
-        .desire-card {
-            background: white;
-            border-radius: 10px;
+            background: #fff;
             padding: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
-        .desire-card h3 {
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .desire-form,
+        .desires-list {
+            margin-bottom: 20px;
+        }
+        .desire-card {
+            border: 1px solid #ddd;
+            padding: 10px;
             margin-bottom: 10px;
-            font-size: 1.25em;
-            color: #2d3748;
         }
-
-        .desire-card p {
-            color: #4a5568;
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>✨ Desire Tracker</h1>
-
-        <div class="auth-buttons">
-            <button id="signInBtn" class="sign-in">Sign in with Google</button>
-            <button id="signOutBtn" class="sign-out" style="display: none;">Sign Out</button>
+        <div class="header">
+            <h1>Desire Tracker</h1>
+            <button id="signInBtn">Sign in with Google</button>
+            <button id="signOutBtn" class="hidden">Sign Out</button>
         </div>
-
-        <div class="input-methods">
-            <button class="button" id="voiceInput">🎤 Voice Input</button>
-            <button class="button" id="manualInput">✏️ Manual Input</button>
+        <div id="userProfile" class="hidden">
+            <img id="userAvatar" src="" alt="Profile Picture" width="50">
+            <span id="userName"></span>
         </div>
-
-        <form id="desireForm" style="display: none;">
-            <div class="form-group">
-                <label for="desireTitle">What's your desire?</label>
-                <input type="text" id="desireTitle" placeholder="Enter your desire...">
-            </div>
-
-            <div class="form-group">
-                <label for="desireDescription">Description</label>
-                <textarea id="desireDescription" placeholder="Describe your desire..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="desirePriority">Priority Level</label>
-                <select id="desirePriority">
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select>
-            </div>
-
+        <form id="desireForm" class="desire-form hidden">
+            <input type="text" id="desireTitle" placeholder="Desire Title" required>
+            <textarea id="desireDescription" placeholder="Desire Description"></textarea>
+            <select id="desirePriority">
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+            </select>
             <button type="submit">Add Desire</button>
         </form>
-
-        <div class="desires-list" id="desiresList">
-            <!-- Desires will be listed here -->
-        </div>
+        <div id="desiresList" class="desires-list hidden"></div>
     </div>
-
     <script type="module">
+        // Import Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
         import {
             getAuth,
@@ -201,11 +74,14 @@
             getFirestore,
             collection,
             addDoc,
-            getDocs,
+            deleteDoc,
             doc,
-            deleteDoc
+            query,
+            orderBy,
+            getDocs
         } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
 
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "your-api-key",
             authDomain: "your-auth-domain",
@@ -215,70 +91,98 @@
             appId: "your-app-id"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        // DOM elements
         const signInBtn = document.getElementById('signInBtn');
         const signOutBtn = document.getElementById('signOutBtn');
+        const userProfile = document.getElementById('userProfile');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
         const desireForm = document.getElementById('desireForm');
         const desiresList = document.getElementById('desiresList');
 
-        const renderDesires = async () => {
-            desiresList.innerHTML = '';
-            const querySnapshot = await getDocs(collection(db, 'desires'));
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const desireCard = document.createElement('div');
-                desireCard.className = 'desire-card';
-                desireCard.innerHTML = `
-                    <h3>${data.title}</h3>
-                    <p>${data.description}</p>
-                    <p><strong>Priority:</strong> ${data.priority}</p>
-                    <button onclick="deleteDesire('${doc.id}')">Delete</button>
-                `;
-                desiresList.appendChild(desireCard);
-            });
-        };
+        // Event listeners
+        signInBtn.addEventListener('click', () => signInWithPopup(auth, provider));
+        signOutBtn.addEventListener('click', () => signOut(auth));
 
-        const addDesire = async (title, description, priority) => {
-            await addDoc(collection(db, 'desires'), { title, description, priority });
-            renderDesires();
-        };
-
-        desireForm.addEventListener('submit', (e) => {
+        desireForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const title = document.getElementById('desireTitle').value;
             const description = document.getElementById('desireDescription').value;
             const priority = document.getElementById('desirePriority').value;
-            addDesire(title, description, priority);
-            desireForm.reset();
-        });
+            const user = auth.currentUser;
 
-        const deleteDesire = async (id) => {
-            await deleteDoc(doc(db, 'desires', id));
-            renderDesires();
-        };
-
-        onAuthStateChanged(auth, (user) => {
             if (user) {
-                signInBtn.style.display = 'none';
-                signOutBtn.style.display = 'block';
-                renderDesires();
-            } else {
-                signInBtn.style.display = 'block';
-                signOutBtn.style.display = 'none';
-                desiresList.innerHTML = '<p>Please sign in to view your desires.</p>';
+                try {
+                    await addDoc(collection(db, 'users', user.uid, 'desires'), {
+                        title, description, priority, createdAt: new Date()
+                    });
+                    loadDesires();
+                    desireForm.reset();
+                } catch (error) {
+                    console.error('Error adding desire: ', error);
+                }
             }
         });
 
-        signInBtn.addEventListener('click', async () => {
-            await signInWithPopup(auth, provider);
-        });
+        // Load desires from Firestore
+        const loadDesires = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const q = query(collection(db, 'users', user.uid, 'desires'), orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+                desiresList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const desire = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'desire-card';
+                    div.innerHTML = `
+                        <h3>${desire.title}</h3>
+                        <p>${desire.description}</p>
+                        <p>Priority: ${desire.priority}</p>
+                        <button onclick="deleteDesire('${doc.id}')">Delete</button>
+                    `;
+                    desiresList.appendChild(div);
+                });
+            }
+        };
 
-        signOutBtn.addEventListener('click', async () => {
-            await signOut(auth);
+        // Delete desire
+        const deleteDesire = async (id) => {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    await deleteDoc(doc(db, 'users', user.uid, 'desires', id));
+                    loadDesires();
+                } catch (error) {
+                    console.error('Error deleting desire: ', error);
+                }
+            }
+        };
+
+        // Monitor authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                signInBtn.classList.add('hidden');
+                signOutBtn.classList.remove('hidden');
+                userProfile.classList.remove('hidden');
+                desireForm.classList.remove('hidden');
+                desiresList.classList.remove('hidden');
+                userAvatar.src = user.photoURL;
+                userName.textContent = user.displayName;
+                loadDesires();
+            } else {
+                signInBtn.classList.remove('hidden');
+                signOutBtn.classList.add('hidden');
+                userProfile.classList.add('hidden');
+                desireForm.classList.add('hidden');
+                desiresList.classList.add('hidden');
+            }
         });
     </script>
 </body>
