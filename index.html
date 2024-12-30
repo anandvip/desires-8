@@ -26,6 +26,20 @@
         h1 {
             text-align: center;
         }
+        .profile {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .profile p {
+            margin: 5px 0;
+        }
         form {
             display: flex;
             flex-direction: column;
@@ -91,8 +105,13 @@
 <body>
     <div class="container">
         <h1>Desire Tracker</h1>
+        <div class="profile" id="profile">
+            <img id="user-photo" src="" alt="User Photo">
+            <p id="user-name"></p>
+            <button id="logout">Sign Out</button>
+        </div>
         <button id="login">Sign in with Google</button>
-        <form id="desire-form">
+        <form id="desire-form" style="display:none;">
             <input type="text" id="title" placeholder="Desire Title" required>
             <textarea id="description" placeholder="Desire Description (optional)"></textarea>
             <select id="priority">
@@ -108,7 +127,7 @@
     <div class="speech-modal" id="speech-modal">Listening...</div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -125,12 +144,42 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        document.getElementById('login').addEventListener('click', async () => {
+        const profileSection = document.getElementById('profile');
+        const loginButton = document.getElementById('login');
+        const logoutButton = document.getElementById('logout');
+        const formSection = document.getElementById('desire-form');
+        const userName = document.getElementById('user-name');
+        const userPhoto = document.getElementById('user-photo');
+
+        loginButton.addEventListener('click', async () => {
             try {
-                const result = await signInWithPopup(auth, provider);
-                console.log('Signed in as:', result.user.displayName);
+                await signInWithPopup(auth, provider);
             } catch (error) {
                 console.error('Login failed:', error);
+            }
+        });
+
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('Sign out failed:', error);
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                profileSection.style.display = 'block';
+                formSection.style.display = 'block';
+                loginButton.style.display = 'none';
+                userName.textContent = user.displayName;
+                userPhoto.src = user.photoURL;
+                console.log('User signed in:', user);
+            } else {
+                profileSection.style.display = 'none';
+                formSection.style.display = 'none';
+                loginButton.style.display = 'block';
+                console.log('User signed out');
             }
         });
 
