@@ -3,835 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desire Tracker</title>
+    <title>Desire Tracker with Firebase</title>
     <style>
-        * {
+        body {
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            color: #2d3748;
-            font-size: 2.5em;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: #4a5568;
-            font-size: 1.125rem;
-        }
-
-        .auth-section {
-            margin-bottom: 2rem;
-            background: #f7fafc;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .user-profile {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 1rem;
-            background: white;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .user-profile.active {
-            display: flex;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid #667eea;
-        }
-
-        .user-details {
             display: flex;
             flex-direction: column;
-            text-align: left;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .user-email {
-            color: #718096;
-            font-size: 0.875rem;
-        }
-
-        .btn {
-            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
+            background: #f5f5f5;
         }
-
-        .btn-google {
-            background: white;
-            color: #4a5568;
-            border: 1px solid #e2e8f0;
-            margin: 0 auto;
-        }
-
-        .btn-google:hover {
-            background: #f7fafc;
-            transform: translateY(-1px);
-        }
-
-        .btn-danger {
-            background: #fc8181;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #f56565;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-            transform: translateY(-1px);
-        }
-
-        .desire-form {
-            display: grid;
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .form-group {
-            display: grid;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        .form-control {
+        .container {
+            max-width: 800px;
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .desires-list {
-            display: grid;
-            gap: 1.25rem;
-        }
-
-        .desire-card {
-            background: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .desire-card:hover {
-            transform: translateY(-2px);
+            margin: 20px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
+        h1 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input, select, button, textarea {
+            font-size: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .desire-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .desire {
+            display: flex;
+            flex-direction: column;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
         .desire-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
         }
-
-        .desire-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #2d3748;
+        .notes {
+            margin-top: 10px;
+            background: #eaeaea;
+            padding: 10px;
+            border-radius: 5px;
         }
-
-        .priority-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .priority-high {
-            background: #fed7d7;
-            color: #c53030;
-        }
-
-        .priority-medium {
-            background: #feebc8;
-            color: #c05621;
-        }
-
-        .priority-low {
-            background: #c6f6d5;
-            color: #2f855a;
-        }
-
-        .desire-description {
-            color: #4a5568;
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .desire-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .desire-date {
-            color: #718096;
-            font-size: 0.875rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1.5rem;
-            color: #718096;
-        }
-
-        .state-notes {
-            margin: 1rem 0;
-            padding: 1rem;
-            background: #f7fafc;
-            border-radius: 0.5rem;
-        }
-
-        .state-notes h4 {
-            color: #2d3748;
-            margin-bottom: 0.75rem;
-        }
-
-        .state-note {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 0.75rem;
-            background: white;
-            border-radius: 0.375rem;
-            margin-bottom: 0.75rem;
-            border: 1px solid #e2e8f0;
-        }
-
-        .state-note-content {
-            flex: 1;
-        }
-
-        .state-note-text {
-            color: #4a5568;
-            margin-bottom: 0.25rem;
-        }
-
-        .state-note-date {
-            font-size: 0.75rem;
-            color: #718096;
-        }
-
-        .state-note-actions {
-            margin-left: 1rem;
-        }
-
-        .state-note-input {
+        .speech-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.375rem;
-            margin-top: 0.75rem;
-            font-size: 0.875rem;
-        }
-
-        .state-note-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 50;
-        }
-
-        .toast {
-            background: white;
-            border-radius: 0.5rem;
-            padding: 1rem 1.5rem;
-            margin-bottom: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            animation: slideIn 0.2s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
             justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid white;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            color: #fff;
+            font-size: 1.5rem;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>✨ Desire Tracker</h1>
-            <p>Transform your dreams into reality</p>
-        </header>
-
-        <section class="auth-section">
-            <div id="userProfile" class="user-profile">
-                <div class="user-info">
-                    <img id="userAvatar" class="user-avatar" alt="Profile">
-                    <div class="user-details">
-                        <span id="userName" class="user-name"></span>
-                        <span id="userEmail" class="user-email"></span>
-                    </div>
-                </div>
-                <button id="signOutBtn" class="btn btn-danger">
-                    🚪 Sign Out
-                </button>
-            </div>
-
-            <button id="signInBtn" class="btn btn-google">
-                <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20">
-                Sign in with Google
-            </button>
-        </section>
-
-        <main id="mainContent" style="display: none;">
-            <form id="desireForm" class="desire-form">
-                <div class="form-group">
-                    <label for="desireTitle">What's your desire?</label>
-                    <input 
-                        type="text" 
-                        id="desireTitle" 
-                        class="form-control"
-                        required 
-                        placeholder="Enter your desire..."
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="desireDescription">Description</label>
-                    <textarea 
-                        id="desireDescription" 
-                        class="form-control"
-                        placeholder="Describe your desire in detail..."
-                    ></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="desirePriority">Priority Level</label>
-                    <select id="desirePriority" class="form-control">
-                        <option value="low">Low Priority</option>
-                        <option value="medium">Medium Priority</option>
-                        <option value="high">High Priority</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    ➕ Add Desire
-                </button>
-            </form>
-
-            <div id="desiresList" class="desires-list"></div>
-        </main>
+        <h1>Desire Tracker</h1>
+        <button id="login">Sign in with Google</button>
+        <form id="desire-form">
+            <input type="text" id="title" placeholder="Desire Title" required>
+            <textarea id="description" placeholder="Desire Description (optional)"></textarea>
+            <select id="priority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <button type="button" id="voice-input">🎤 Voice Input</button>
+            <button type="submit">Add Desire</button>
+        </form>
+        <div class="desire-list" id="desire-list"></div>
     </div>
-
-    <div id="toastContainer" class="toast-container"></div>
-    
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="spinner"></div>
-    </div>
-
+    <div class="speech-modal" id="speech-modal">Listening...</div>
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-        import { 
-            getAuth, 
-            signInWithPopup, 
-            GoogleAuthProvider,
-            signOut,
-            onAuthStateChanged 
-        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-        import { 
-            getFirestore,
-            collection,
-            addDoc,
-            deleteDoc,
-            updateDoc,
-            doc,
-            query,
-            orderBy,
-            getDocs
-        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCLfBy9R_tL8WPRJpmKZMcy70OzhId9V1w",
             authDomain: "desires-b59a7.firebaseapp.com",
             projectId: "desires-b59a7",
-            storageBucket: "desires-b59a7.firebasestorage.app",
+            storageBucket: "desires-b59a7.appspot.com",
             messagingSenderId: "942109661123",
             appId: "1:942109661123:web:84f2532a442f9d49bb8f76"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Utility functions
-        const utils = {
-            showLoading() {
-                document.getElementById('loadingOverlay').classList.add('active');
-            },
-            
-            hideLoading() {
-                document.getElementById('loadingOverlay').classList.remove('active');
-            },
-            
-            formatDate(dateString) {
-                return new Date(dateString).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  });
-            },
-
-            showToast(message, type = 'success') {
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                
-                const icon = type === 'success' ? '✅' : 
-                            type === 'error' ? '❌' : 
-                            '🔔';
-                
-                toast.innerHTML = `
-                    <span>${icon}</span>
-                    <span>${message}</span>
-                `;
-                
-                document.getElementById('toastContainer').appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(100%)';
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
+        document.getElementById('login').addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                console.log('Signed in as:', result.user.displayName);
+            } catch (error) {
+                console.error('Login failed:', error);
             }
-        };
+        });
 
-        // Main Application Class
         class DesireTracker {
             constructor() {
-                this.currentUser = null;
-                this.desires = [];
-                this.initializeElements();
-                this.initializeEventListeners();
-                this.initializeAuth();
+                this.desireList = document.getElementById('desire-list');
+                this.init();
             }
 
-            initializeElements() {
-                this.elements = {
-                    mainContent: document.getElementById('mainContent'),
-                    userProfile: document.getElementById('userProfile'),
-                    userAvatar: document.getElementById('userAvatar'),
-                    userName: document.getElementById('userName'),
-                    userEmail: document.getElementById('userEmail'),
-                    signInBtn: document.getElementById('signInBtn'),
-                    signOutBtn: document.getElementById('signOutBtn'),
-                    desireForm: document.getElementById('desireForm'),
-                    desiresList: document.getElementById('desiresList')
-                };
-            }
-
-            initializeEventListeners() {
-                this.elements.signInBtn.addEventListener('click', () => this.handleSignIn());
-                this.elements.signOutBtn.addEventListener('click', () => this.handleSignOut());
-                this.elements.desireForm.addEventListener('submit', (e) => this.handleDesireSubmit(e));
-            }
-
-            initializeAuth() {
-                onAuthStateChanged(auth, async (user) => {
-                    console.log('Auth state changed:', user ? 'logged in' : 'logged out');
-                    this.currentUser = user;
-                    this.updateUI();
-                    
-                    if (user) {
-                        try {
-                            await this.loadDesires();
-                        } catch (error) {
-                            console.error('Error loading desires:', error);
-                            utils.showToast('Failed to load desires', 'error');
-                        }
-                    }
+            async init() {
+                document.getElementById('desire-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addDesire();
                 });
+                document.getElementById('voice-input').addEventListener('click', () => this.startVoiceInput());
+                this.loadDesires();
             }
 
-            async handleSignIn() {
-                try {
-                    utils.showLoading();
-                    const result = await signInWithPopup(auth, provider);
-                    utils.showToast(`Welcome, ${result.user.displayName}! 🎉`);
-                } catch (error) {
-                    console.error('Sign-in error:', error);
-                    utils.showToast(
-                        error.code === 'auth/popup-closed-by-user'
-                            ? 'Sign-in cancelled'
-                            : 'Failed to sign in. Please try again.',
-                        'error'
-                    );
-                } finally {
-                    utils.hideLoading();
-                }
-            }
-
-            async handleSignOut() {
-                try {
-                    utils.showLoading();
-                    await signOut(auth);
-                    this.desires = [];
-                    utils.showToast('Successfully signed out 👋');
-                } catch (error) {
-                    console.error('Sign-out error:', error);
-                    utils.showToast('Failed to sign out', 'error');
-                } finally {
-                    utils.hideLoading();
-                }
-            }
-
-            updateUI() {
-                if (this.currentUser) {
-                    this.elements.userProfile.classList.add('active');
-                    this.elements.userAvatar.src = this.currentUser.photoURL;
-                    this.elements.userName.textContent = this.currentUser.displayName;
-                    this.elements.userEmail.textContent = this.currentUser.email;
-                    this.elements.signInBtn.style.display = 'none';
-                    this.elements.mainContent.style.display = 'block';
-                } else {
-                    this.elements.userProfile.classList.remove('active');
-                    this.elements.signInBtn.style.display = 'flex';
-                    this.elements.mainContent.style.display = 'none';
-                    this.elements.desiresList.innerHTML = '';
-                }
-            }
-
-            async handleDesireSubmit(e) {
-                e.preventDefault();
-                if (!this.currentUser) return;
-
-                const formData = {
-                    title: this.elements.desireForm.desireTitle.value.trim(),
-                    description: this.elements.desireForm.desireDescription.value.trim(),
-                    priority: this.elements.desireForm.desirePriority.value
-                };
-
-                if (!formData.title) {
-                    utils.showToast('Please enter a desire title', 'error');
-                    return;
-                }
+            async addDesire() {
+                const title = document.getElementById('title').value;
+                const description = document.getElementById('description').value;
+                const priority = document.getElementById('priority').value;
+                if (!title) return alert('Title is required!');
 
                 try {
-                    utils.showLoading();
-                    await this.addDesire(formData);
-                    this.elements.desireForm.reset();
-                    utils.showToast('Desire added successfully! 🌟');
+                    await addDoc(collection(db, 'desires'), {
+                        title,
+                        description,
+                        priority,
+                        notes: [],
+                        timestamp: new Date().toISOString()
+                    });
+                    this.loadDesires();
                 } catch (error) {
-                    console.error('Error adding desire:', error);
-                    utils.showToast('Failed to add desire', 'error');
-                } finally {
-                    utils.hideLoading();
+                    console.error('Failed to add desire:', error);
                 }
-            }
-
-            async addDesire(desireData) {
-                if (!this.currentUser) throw new Error('User not authenticated');
-
-                const desire = {
-                    ...desireData,
-                    userId: this.currentUser.uid,
-                    date: new Date().toISOString(),
-                    id: Date.now(),
-                    stateNotes: []
-                };
-
-                try {
-                    await addDoc(collection(db, 'desires'), desire);
-                    await this.loadDesires();
-                } catch (error) {
-                    throw error;
-                }
-            }
-
-            async addStateNote(desireId, noteText) {
-                if (!this.currentUser) throw new Error('User not authenticated');
-
-                try {
-                    utils.showLoading();
-                    const desireDoc = this.desires.find(d => d.id === desireId);
-                    if (!desireDoc) throw new Error('Desire not found');
-
-                    const newNote = {
-                        id: Date.now(),
-                        text: noteText,
-                        date: new Date().toISOString()
-                    };
-
-                    const updatedNotes = [newNote, ...(desireDoc.stateNotes || [])];
-                    await updateDoc(doc(db, 'desires', desireId), { stateNotes: updatedNotes });
-                    await this.loadDesires();
-                    utils.showToast('Note added successfully! 📝');
-                } catch (error) {
-                    console.error('Error adding note:', error);
-                    utils.showToast('Failed to add note', 'error');
-                } finally {
-                    utils.hideLoading();
-                }
-            }
-
-            async deleteStateNote(desireId, noteId) {
-                if (!this.currentUser) throw new Error('User not authenticated');
-
-                try {
-                    utils.showLoading();
-                    const desireDoc = this.desires.find(d => d.id === desireId);
-                    if (!desireDoc) throw new Error('Desire not found');
-
-                    const updatedNotes = desireDoc.stateNotes.filter(note => note.id !== noteId);
-                    await updateDoc(doc(db, 'desires', desireId), { stateNotes: updatedNotes });
-                    await this.loadDesires();
-                    utils.showToast('Note deleted successfully');
-                } catch (error) {
-                    console.error('Error deleting note:', error);
-                    utils.showToast('Failed to delete note', 'error');
-                } finally {
-                    utils.hideLoading();
-                }
-            }
-
-            async deleteDesire(id) {
-                if (!this.currentUser) throw new Error('User not authenticated');
-
-                try {
-                    utils.showLoading();
-                    await deleteDoc(doc(db, 'desires', id));
-                    await this.loadDesires();
-                    utils.showToast('Desire deleted successfully 🗑️');
-                } catch (error) {
-                    console.error('Error deleting desire:', error);
-                    utils.showToast('Failed to delete desire', 'error');
-                } finally {
-                    utils.hideLoading();
-                }
+                document.getElementById('desire-form').reset();
             }
 
             async loadDesires() {
-                if (!this.currentUser) {
-                    this.desires = [];
-                    this.renderDesires();
-                    return;
-                }
-
+                this.desireList.innerHTML = '';
                 try {
-                    const q = query(
-                        collection(db, 'desires'),
-                        orderBy('date', 'desc')
-                    );
-                    const snapshot = await getDocs(q);
-                    this.desires = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    this.renderDesires();
+                    const querySnapshot = await getDocs(collection(db, 'desires'));
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        this.renderDesire(doc.id, data);
+                    });
                 } catch (error) {
-                    console.error('Error loading desires:', error);
-                    throw error;
+                    console.error('Failed to load desires:', error);
                 }
             }
 
-            renderDesires() {
-                if (this.desires.length === 0) {
-                    this.elements.desiresList.innerHTML = `
-                        <div class="empty-state">
-                            <h3>No desires added yet</h3>
-                            <p>Start by adding your first desire above! 🚀</p>
+            renderDesire(id, data) {
+                const div = document.createElement('div');
+                div.className = 'desire';
+                div.innerHTML = `
+                    <div class="desire-header">
+                        <div>
+                            <p><strong>${data.title}</strong> (${data.priority})</p>
+                            <p>${data.description || ''}</p>
+                            <p><em>${new Date(data.timestamp).toLocaleString()}</em></p>
                         </div>
-                    `;
-                    return;
+                        <button onclick="tracker.deleteDesire('${id}')">Delete</button>
+                    </div>
+                    <div class="notes" id="notes-${id}"></div>
+                    <div>
+                        <input type="text" id="note-input-${id}" placeholder="Add a note">
+                        <button onclick="tracker.addNote('${id}')">Add Note</button>
+                    </div>
+                `;
+                this.desireList.appendChild(div);
+                data.notes.forEach(note => this.renderNote(id, note));
+            }
+
+            async deleteDesire(id) {
+                try {
+                    await deleteDoc(doc(db, 'desires', id));
+                    this.loadDesires();
+                } catch (error) {
+                    console.error('Failed to delete desire:', error);
                 }
+            }
 
-                this.elements.desiresList.innerHTML = this.desires
-                    .map(desire => `
-                        <div class="desire-card">
-                            <div class="desire-header">
-                                <h3 class="desire-title">${desire.title}</h3>
-                                <span class="priority-badge priority-${desire.priority}">
-                                    ${desire.priority.charAt(0).toUpperCase() + desire.priority.slice(1)}
-                                </span>
-                            </div>
-                            
-                            <p class="desire-description">
-                                ${desire.description || 'No description provided'}
-                            </p>
-                            
-                            <div class="state-notes">
-                                <h4>Progress Notes</h4>
-                                ${(desire.stateNotes || []).map(note => `
-                                    <div class="state-note">
-                                        <div class="state-note-content">
-                                            <p class="state-note-text">${note.text}</p>
-                                            <span class="state-note-date">
-                                                ${utils.formatDate(note.date)}
-                                            </span>
-                                        </div>
-                                        <div class="state-note-actions">
-                                            <button 
-                                                class="btn btn-danger"
-                                                onclick="app.deleteStateNote('${desire.id}', ${note.id})"
-                                            >
-                                                ❌
-                                            </button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                                
-                                <input 
-                                    type="text" 
-                                    class="state-note-input" 
-                                    placeholder="Add a progress note..."
-                                    onkeypress="if(event.key === 'Enter' && this.value.trim()) {
-                                        app.addStateNote('${desire.id}', this.value.trim());
-                                        this.value = '';
-                                    }"
-                                >
-                            </div>
+            async addNote(id) {
+                const input = document.getElementById(`note-input-${id}`);
+                const note = input.value;
+                if (!note) return alert('Note cannot be empty!');
 
-                            <div class="desire-footer">
-                                <span class="desire-date">
-                                    Created ${utils.formatDate(desire.date)}
-                                </span>
-                                <button 
-                                    class="btn btn-danger"
-                                    onclick="app.deleteDesire('${desire.id}')"
-                                >
-                                    🗑️ Delete
-                                </button>
-                            </div>
-                        </div>
-                    `)
-                    .join('');
+                try {
+                    const desireRef = doc(db, 'desires', id);
+                    const querySnapshot = await getDocs(collection(db, 'desires'));
+                    const desire = querySnapshot.docs.find(d => d.id === id);
+                    const data = desire.data();
+                    data.notes.push({ text: note, timestamp: new Date().toISOString() });
+                    await updateDoc(desireRef, { notes: data.notes });
+                    this.loadDesires();
+                } catch (error) {
+                    console.error('Failed to add note:', error);
+                }
+                input.value = '';
+            }
+
+            renderNote(desireId, note) {
+                const notesDiv = document.getElementById(`notes-${desireId}`);
+                const div = document.createElement('div');
+                div.className = 'note';
+                div.innerHTML = `<p>${note.text} <em>${new Date(note.timestamp).toLocaleString()}</em></p>`;
+                notesDiv.appendChild(div);
+            }
+
+            startVoiceInput() {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                const speechModal = document.getElementById('speech-modal');
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    speechModal.style.display = 'flex';
+                };
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('title').value = transcript;
+                };
+                recognition.onend = () => {
+                    speechModal.style.display = 'none';
+                };
+                recognition.start();
             }
         }
 
-        // Initialize and expose the application globally
-        window.app = new DesireTracker();
+        const tracker = new DesireTracker();
     </script>
 </body>
 </html>
