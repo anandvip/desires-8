@@ -208,8 +208,8 @@
             const newDesire = {
                 id: Date.now().toString(),
                 title,
-                description,
-                priority,
+                description: description || '',
+                priority: priority || 'Low',
                 notes: []
             };
 
@@ -227,9 +227,9 @@
         async function addNoteToDesire(userId, desireId, noteText) {
             const userDoc = doc(db, 'users', userId);
             const userSnapshot = await getDoc(userDoc);
-            const desires = userSnapshot.data().desires || [];
+            const desires = userSnapshot.data()?.desires || [];
 
-            const desire = desires.find(d => d.id === desireId);
+            const desire = desires.find(d => d?.id === desireId);
             if (desire) {
                 desire.notes.push({ text: noteText, timestamp: new Date().toISOString() });
                 await setDoc(userDoc, { desires });
@@ -243,6 +243,11 @@
             desireList.innerHTML = '';
 
             desires.forEach(desire => {
+                if (!desire || !desire.title) {
+                    console.warn('Skipping invalid desire:', desire);
+                    return;
+                }
+
                 const div = document.createElement('div');
                 div.className = 'desire';
                 div.innerHTML = `
