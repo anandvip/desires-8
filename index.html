@@ -100,6 +100,9 @@
             font-size: 1.5rem;
             display: none;
         }
+        .state-selector {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -128,7 +131,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCLfBy9R_tL8WPRJpmKZMcy70OzhId9V1w",
@@ -167,149 +170,115 @@
             }
         });
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 profileSection.style.display = 'block';
                 formSection.style.display = 'block';
                 loginButton.style.display = 'none';
                 userName.textContent = user.displayName;
                 userPhoto.src = user.photoURL;
-                console.log('User signed in:', user);
+
+                await loadDesires(user.uid);
             } else {
                 profileSection.style.display = 'none';
                 formSection.style.display = 'none';
                 loginButton.style.display = 'block';
-                console.log('User signed out');
             }
         });
 
-        class DesireTracker {
-            constructor() {
-                this.desireList = document.getElementById('desire-list');
-                this.init();
+        async function loadDesires(userId) {
+            const localDesires = JSON.parse(localStorage.getItem('desires')) || [];
+            const userDoc = doc(db, 'users', userId);
+            const userSnapshot = await getDoc(userDoc);
+
+            let desires = userSnapshot.exists() ? userSnapshot.data().desires || [] : [];
+
+            // Sync localStorage with Firestore
+            if (localDesires.length > desires.length) {
+                desires = localDesires;
+                await setDoc(userDoc, { desires });
+            } else {
+                localStorage.setItem('desires', JSON.stringify(desires));
             }
 
-            async init() {
-                document.getElementById('desire-form').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.addDesire();
-                });
-                document.getElementById('voice-input').addEventListener('click', () => this.startVoiceInput());
-                this.loadDesires();
+            renderDesires(desires, userId);
+        }
+
+        async function addDesire(userId, title, description, priority) {
+            const newDesire = {
+                id: Date.now().toString(),
+                title,
+                description,
+                priority,
+                notes: []
+            };
+
+            const userDoc = doc(db, 'users', userId);
+            const userSnapshot = await getDoc(userDoc);
+            const desires = userSnapshot.exists() ? userSnapshot.data().desires || [] : [];
+
+            desires.push(newDesire);
+
+            await setDoc(userDoc, { desires });
+            localStorage.setItem('desires', JSON.stringify(desires));
+            renderDesires(desires, userId);
+        }
+
+        async function addNoteToDesire(userId, desireId, noteText) {
+            const userDoc = doc(db, 'users', userId);
+            const userSnapshot = await getDoc(userDoc);
+            const desires = userSnapshot.data().desires || [];
+
+            const desire = desires.find(d => d.id === desireId);
+            if (desire) {
+                desire.notes.push({ text: noteText, timestamp: new Date().toISOString() });
+                await setDoc(userDoc, { desires });
+                localStorage.setItem('desires', JSON.stringify(desires));
+                renderDesires(desires, userId);
             }
+        }
 
-            async addDesire() {
-                const title = document.getElementById('title').value;
-                const description = document.getElementById('description').value;
-                const priority = document.getElementById('priority').value;
-                if (!title) return alert('Title is required!');
+        function renderDesires(desires, userId) {
+            const desireList = document.getElementById('desire-list');
+            desireList.innerHTML = '';
 
-                try {
-                    await addDoc(collection(db, 'desires'), {
-                        title,
-                        description,
-                        priority,
-                        notes: [],
-                        timestamp: new Date().toISOString()
-                    });
-                    this.loadDesires();
-                } catch (error) {
-                    console.error('Failed to add desire:', error);
-                }
-                document.getElementById('desire-form').reset();
-            }
-
-            async loadDesires() {
-                this.desireList.innerHTML = '';
-                try {
-                    const querySnapshot = await getDocs(collection(db, 'desires'));
-                    querySnapshot.forEach(doc => {
-                        const data = doc.data();
-                        this.renderDesire(doc.id, data);
-                    });
-                } catch (error) {
-                    console.error('Failed to load desires:', error);
-                }
-            }
-
-            renderDesire(id, data) {
+            desires.forEach(desire => {
                 const div = document.createElement('div');
                 div.className = 'desire';
                 div.innerHTML = `
                     <div class="desire-header">
                         <div>
-                            <p><strong>${data.title}</strong> (${data.priority})</p>
-                            <p>${data.description || ''}</p>
-                            <p><em>${new Date(data.timestamp).toLocaleString()}</em></p>
+                            <p><strong>${desire.title}</strong> (${desire.priority})</p>
+                            <p>${desire.description || ''}</p>
                         </div>
-                        <button onclick="tracker.deleteDesire('${id}')">Delete</button>
                     </div>
-                    <div class="notes" id="notes-${id}"></div>
+                    <div class="notes">
+                        ${desire.notes.map(note => `<p>${note.text} <em>${new Date(note.timestamp).toLocaleString()}</em></p>`).join('')}
+                    </div>
                     <div>
-                        <input type="text" id="note-input-${id}" placeholder="Add a note">
-                        <button onclick="tracker.addNote('${id}')">Add Note</button>
+                        <input type="text" placeholder="Add a note" id="note-input-${desire.id}">
+                        <button onclick="addNoteToDesire('${userId}', '${desire.id}', document.getElementById('note-input-${desire.id}').value)">Add Note</button>
                     </div>
                 `;
-                this.desireList.appendChild(div);
-                data.notes.forEach(note => this.renderNote(id, note));
-            }
-
-            async deleteDesire(id) {
-                try {
-                    await deleteDoc(doc(db, 'desires', id));
-                    this.loadDesires();
-                } catch (error) {
-                    console.error('Failed to delete desire:', error);
-                }
-            }
-
-            async addNote(id) {
-                const input = document.getElementById(`note-input-${id}`);
-                const note = input.value;
-                if (!note) return alert('Note cannot be empty!');
-
-                try {
-                    const desireRef = doc(db, 'desires', id);
-                    const querySnapshot = await getDocs(collection(db, 'desires'));
-                    const desire = querySnapshot.docs.find(d => d.id === id);
-                    const data = desire.data();
-                    data.notes.push({ text: note, timestamp: new Date().toISOString() });
-                    await updateDoc(desireRef, { notes: data.notes });
-                    this.loadDesires();
-                } catch (error) {
-                    console.error('Failed to add note:', error);
-                }
-                input.value = '';
-            }
-
-            renderNote(desireId, note) {
-                const notesDiv = document.getElementById(`notes-${desireId}`);
-                const div = document.createElement('div');
-                div.className = 'note';
-                div.innerHTML = `<p>${note.text} <em>${new Date(note.timestamp).toLocaleString()}</em></p>`;
-                notesDiv.appendChild(div);
-            }
-
-            startVoiceInput() {
-                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                const speechModal = document.getElementById('speech-modal');
-                recognition.lang = 'en-US';
-
-                recognition.onstart = () => {
-                    speechModal.style.display = 'flex';
-                };
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById('title').value = transcript;
-                };
-                recognition.onend = () => {
-                    speechModal.style.display = 'none';
-                };
-                recognition.start();
-            }
+                desireList.appendChild(div);
+            });
         }
 
-        const tracker = new DesireTracker();
+        document.getElementById('desire-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const priority = document.getElementById('priority').value;
+            const userId = auth.currentUser.uid;
+
+            if (!title) {
+                alert('Title is required!');
+                return;
+            }
+
+            await addDesire(userId, title, description, priority);
+            document.getElementById('desire-form').reset();
+        });
     </script>
 </body>
 </html>
